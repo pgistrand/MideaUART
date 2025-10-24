@@ -8,6 +8,30 @@ namespace ac {
 
 static const char *TAG = "AirConditioner";
 
+void AirConditioner::m_runSeq() {
+
+  if (this->m_seq == 0)
+    this->m_getStatus();
+  else if(this->m_seq == 1){
+    this->m_getDiag1();
+  }
+  else if(this->m_seq == 2){
+    this->m_getStatus();
+  }
+  else if(this->m_seq == 3){
+    this->m_getDiag2();
+  }
+  else if(this->m_seq == 4){
+    this->m_getStatus();
+  }
+  else if(this->m_seq == 5){
+    this->m_getDiag3();
+  }
+
+  this->m_seq++;
+  if(this->m_seq>5){this->m_seq=0;}
+}
+
 void AirConditioner::m_setup() {
   if (this->m_autoconfStatus != AUTOCONF_DISABLED)
     this->m_getCapabilities();
@@ -128,17 +152,26 @@ void AirConditioner::setPowerState(bool state) {
 
 void AirConditioner::m_getPowerUsage() {
   QueryPowerData data{};
-  LOG_D(TAG, "Enqueuing a GET_POWERUSAGE(0x41) request...");
+  LOG_D(TAG, "Enqueuing a GET_POWERUSAGE(0x41 00 00 04) request...");
   this->m_queueRequest(FrameType::DEVICE_QUERY, std::move(data),
     // onData
     [this](FrameData data) -> ResponseStatus {
       const auto status = data.to<StatusData>();
-      if (!status.hasPowerInfo())
+      if (!status.hasValues())
         return ResponseStatus::RESPONSE_WRONG;
-      if (this->m_powerUsage != status.getPowerUsage()) {
-        this->m_powerUsage = status.getPowerUsage();
-        this->sendUpdate();
-      }
+      LOG_D(TAG, "Receiving Power/Energy Values");
+//      if (status.hasValuesPower()) {
+        if (this->m_energyUsage != status.getEnergyUsage()) {
+          this->m_energyUsage = status.getEnergyUsage();
+          this->sendUpdate();
+          LOG_D(TAG, "Updating EnergyUsage");
+        }
+        if (this->m_powerUsage != status.getPowerUsage()) {
+          this->m_powerUsage = status.getPowerUsage();
+          this->sendUpdate();
+          LOG_D(TAG, "Updating PowerUsage");
+        }
+//      }
       return ResponseStatus::RESPONSE_OK;
     }
   );
@@ -174,7 +207,7 @@ void AirConditioner::m_getCapabilities() {
 
 void AirConditioner::m_getStatus() {
   QueryStateData data{};
-  LOG_D(TAG, "Enqueuing a GET_STATUS(0x41) request...");
+  LOG_D(TAG, "Enqueuing a GET_STATUS(41 00 00 FF) request...");
   this->m_queueRequest(FrameType::DEVICE_QUERY, std::move(data),
     // onData
     std::bind(&AirConditioner::m_readStatus, this, std::placeholders::_1)
@@ -218,6 +251,89 @@ ResponseStatus AirConditioner::m_readStatus(FrameData data) {
   setProperty(this->m_indoorTemp, newStatus.getIndoorTemp(), hasUpdate);
   setProperty(this->m_outdoorTemp, newStatus.getOutdoorTemp(), hasUpdate);
   setProperty(this->m_indoorHumidity, newStatus.getHumiditySetpoint(), hasUpdate);
+  if (hasUpdate)
+    this->sendUpdate();
+  return ResponseStatus::RESPONSE_OK;
+}
+
+void AirConditioner::m_getDiag1() {
+  QueryDiagData1 data{};
+  LOG_D(TAG, "Enqueuing a GET_STATUS(41 00 00 01) request...");
+  this->m_queueRequest(FrameType::DEVICE_QUERY, std::move(data),
+    // onData
+    std::bind(&AirConditioner::m_readDiag1, this, std::placeholders::_1)
+  );
+}
+void AirConditioner::m_getDiag2() {
+  QueryDiagData2 data{};
+  LOG_D(TAG, "Enqueuing a GET_STATUS(41 00 00 02) request...");
+  this->m_queueRequest(FrameType::DEVICE_QUERY, std::move(data),
+    // onData
+    std::bind(&AirConditioner::m_readDiag2, this, std::placeholders::_1)
+  );
+}
+void AirConditioner::m_getDiag3() {
+  QueryDiagData3 data{};
+  LOG_D(TAG, "Enqueuing a GET_STATUS(41 00 00 03) request...");
+  this->m_queueRequest(FrameType::DEVICE_QUERY, std::move(data),
+    // onData
+    std::bind(&AirConditioner::m_readDiag3, this, std::placeholders::_1)
+  );
+}
+// --------------------------------------------------------------------------------
+ResponseStatus AirConditioner::m_readDiag1(FrameData data) {
+  if (! (data.hasValues() && (data.subType()==1)) )
+    return ResponseStatus::RESPONSE_WRONG;
+
+  LOG_D(TAG, "New diag1 data received. Parsing...");
+  bool hasUpdate = false;
+
+  const DiagData newDiag = data.to<DiagData>();
+  this->m_diag.copyDiag(newDiag);
+  setProperty(this->m_compressorSpeed, newDiag.getCompressorSpeed(), hasUpdate);
+  setProperty(this->m_t1Temp, newDiag.getT1Temp(), hasUpdate);
+  setProperty(this->m_t2Temp, newDiag.getT2Temp(), hasUpdate);
+  setProperty(this->m_t3Temp, newDiag.getT3Temp(), hasUpdate);
+  setProperty(this->m_t4Temp, newDiag.getT4Temp(), hasUpdate);
+  setProperty(this->m_eev, newDiag.getEEV(), hasUpdate);
+  setProperty(this->m_runMode, newDiag.getRunMode(), hasUpdate);
+  setProperty(this->m_val1_8, newDiag.getVal1_8(), hasUpdate);
+
+  if (hasUpdate)
+    this->sendUpdate();
+  return ResponseStatus::RESPONSE_OK;
+}
+// --------------------------------------------------------------------------------
+ResponseStatus AirConditioner::m_readDiag2(FrameData data) {
+  if (! ( data.hasValues() && (data.subType()==2) ))
+    return ResponseStatus::RESPONSE_WRONG;
+
+  LOG_D(TAG, "New diag2 data received. Parsing...");
+  bool hasUpdate = false;
+
+  const DiagData newDiag = data.to<DiagData>();
+  this->m_diag.copyDiag(newDiag);
+  setProperty(this->m_idFTarget, newDiag.getIdFTarget(), hasUpdate);
+  setProperty(this->m_idFVal, newDiag.getIdFVal(), hasUpdate);
+  setProperty(this->m_val2_12, newDiag.getVal2_12(), hasUpdate);
+
+  if (hasUpdate)
+    this->sendUpdate();
+  return ResponseStatus::RESPONSE_OK;
+}
+// --------------------------------------------------------------------------------
+ResponseStatus AirConditioner::m_readDiag3(FrameData data) {
+  if (! ( data.hasValues() && (data.subType()==3) ))
+    return ResponseStatus::RESPONSE_WRONG;
+
+  LOG_D(TAG, "New diag3 data received. Parsing...");
+  bool hasUpdate = false;
+
+  const DiagData newDiag = data.to<DiagData>();
+  this->m_diag.copyDiag(newDiag);
+  setProperty(this->m_odFVal, newDiag.getOdFVal(), hasUpdate);
+  setProperty(this->m_compressorTarget, newDiag.getCompressorTarget(), hasUpdate);
+
   if (hasUpdate)
     this->sendUpdate();
   return ResponseStatus::RESPONSE_OK;

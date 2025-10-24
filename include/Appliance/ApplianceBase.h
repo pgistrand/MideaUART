@@ -88,8 +88,8 @@ class ApplianceBase {
   bool m_beeper{};
 
   void m_queueNotify(FrameType type, FrameData data) { this->m_queueRequest(type, std::move(data), nullptr); }
-  void m_queueRequest(FrameType type, FrameData data, ResponseHandler onData, Handler onSuccess = nullptr, Handler onError = nullptr);
-  void m_queueRequestPriority(FrameType type, FrameData data, ResponseHandler onData = nullptr, Handler onSuccess = nullptr, Handler onError = nullptr);
+  void m_queueRequest(FrameType type, FrameData data, ResponseHandler onData, Handler onSucess = nullptr, Handler onError = nullptr);
+  void m_queueRequestPriority(FrameType type, FrameData data, ResponseHandler onData = nullptr, Handler onSucess = nullptr, Handler onError = nullptr);
   void m_sendFrame(FrameType type, const FrameData &data);
   // Setup for appliances
   virtual void m_setup() {}
@@ -97,6 +97,7 @@ class ApplianceBase {
   virtual void m_loop() {}
   /// Calling then ready for request
   virtual void m_onIdle() {}
+  //virtual void m_onIdle2() {}
   /// Calling on receiving request
   virtual void m_onRequest(const Frame &frame) {}
  private:
@@ -144,7 +145,7 @@ class ApplianceBase {
   /* ############################## */
   /* ### COMMUNICATION SETTINGS ### */
   /* ############################## */
-
+  
   // Stream serial interface
   Stream *m_stream;
   // Minimal period between requests

@@ -68,6 +68,7 @@ void ApplianceBase::loop() {
     return;
   if (this->m_queue.empty()) {
     this->m_onIdle();
+    //this->m_onIdle2();
     return;
   }
   this->m_request = this->m_queue.front();
@@ -77,7 +78,7 @@ void ApplianceBase::loop() {
   if (this->m_request->onData != nullptr) {
     this->m_resetAttempts();
     this->m_resetTimeout();
-  } else {
+  } else {    
     this->m_destroyRequest();
   }
 }
@@ -169,14 +170,14 @@ void ApplianceBase::m_sendFrame(FrameType type, const FrameData &data) {
   this->m_periodTimer.start(this->m_period);
 }
 
-void ApplianceBase::m_queueRequest(FrameType type, FrameData data, ResponseHandler onData, Handler onSuccess, Handler onError) {
+void ApplianceBase::m_queueRequest(FrameType type, FrameData data, ResponseHandler onData, Handler onSucess, Handler onError) {
   LOG_D(TAG, "Enqueuing the request...");
-  this->m_queue.push_back(new Request{std::move(data), std::move(onData), std::move(onSuccess), std::move(onError), type});
+  this->m_queue.push_back(new Request{std::move(data), std::move(onData), std::move(onSucess), std::move(onError), type});
 }
 
-void ApplianceBase::m_queueRequestPriority(FrameType type, FrameData data, ResponseHandler onData, Handler onSuccess, Handler onError) {
+void ApplianceBase::m_queueRequestPriority(FrameType type, FrameData data, ResponseHandler onData, Handler onSucess, Handler onError) {
   LOG_D(TAG, "Priority request queuing...");
-  this->m_queue.push_front(new Request{std::move(data), std::move(onData), std::move(onSuccess), std::move(onError), type});
+  this->m_queue.push_front(new Request{std::move(data), std::move(onData), std::move(onSucess), std::move(onError), type});
 }
 
 void ApplianceBase::setBeeper(bool value) {

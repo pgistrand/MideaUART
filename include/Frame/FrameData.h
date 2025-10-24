@@ -15,11 +15,17 @@ class FrameData {
   FrameData(std::initializer_list<uint8_t> list) : m_data(list) {}
   FrameData(uint8_t size) : m_data(size, 0) {}
   template<typename T> T to() { return std::move(*this); }
-  const uint8_t *data() const { return this->m_data.data(); }
-  uint8_t size() const { return this->m_data.size(); }
-  bool hasID(uint8_t value) const { return this->m_data[0] == value; }
-  bool hasStatus() const { return this->hasID(0xC0); }
-  bool hasPowerInfo() const { return this->hasID(0xC1); }
+  const uint8_t *data()          const { return this->m_data.data(); }
+  uint8_t size()                 const { return this->m_data.size(); }
+  bool hasID(uint8_t value)      const { return this->m_data[0] == value; }
+  bool hasStatus()               const { return this->hasID(0xC0); }
+  bool hasValues()               const { return this->hasID(0xC1); }
+  uint8_t subType()              const { return this->m_data[3];}
+  bool hasSubType(uint8_t value) const { return this->m_data[3] == value; }
+  bool hasValuesDiag()           const { return this->hasSubType(0x01); }
+  bool hasValuesIDU()            const { return this->hasSubType(0x02); }
+  bool hasValuesODU()            const { return this->hasSubType(0x03); }
+  bool hasValuesPower()          const { return this->hasSubType(0x44); }
   void appendCRC() { this->m_data.push_back(this->m_calcCRC()); }
   void updateCRC() {
     this->m_data.pop_back();

@@ -106,6 +106,7 @@ class StatusData : public FrameData {
 
   /* POWER USAGE */
   float getPowerUsage() const;
+  float getEnergyUsage() const;
 
   void setBeeper(bool state) {
     this->m_setMask(1, true, 2);
@@ -143,6 +144,7 @@ class QueryStateData : public FrameData {
                                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                 0x03, FrameData::m_getID()}) { this->appendCRC(); }
 };
+
 
 class QueryPowerData : public FrameData {
  public:
