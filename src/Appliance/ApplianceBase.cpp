@@ -1,7 +1,7 @@
 #include "Appliance/ApplianceBase.h"
 #include "Helpers/Log.h"
 //#ifdef ARDUINO_ARCH_ESP32
-#include <WiFi.h>
+//#include <WiFi.h>
 //#else
 //#include <ESP8266WiFi.h>
 //#endif
@@ -122,9 +122,9 @@ static uint8_t getSignalStrength() {
 
 void ApplianceBase::m_sendNetworkNotify(FrameType msgType) {
   NetworkNotifyData notify{};
-  notify.setConnected(WiFi.isConnected());
+  //notify.setConnected(WiFi.isConnected());
   notify.setSignalStrength(getSignalStrength());
-  notify.setIP(WiFi.localIP());
+  //notify.setIP(WiFi.localIP());
   notify.appendCRC();
   if (msgType == NETWORK_NOTIFY) {
     LOG_D(TAG, "Enqueuing a DEVICE_NETWORK(0x0D) notification...");
