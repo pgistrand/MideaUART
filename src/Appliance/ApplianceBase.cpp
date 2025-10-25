@@ -109,21 +109,21 @@ void ApplianceBase::m_handler(const Frame &frame) {
   this->m_onRequest(frame);
 }
 
-static uint8_t getSignalStrength() {
-  const int32_t dbm = WiFi.RSSI();
-  if (dbm > -63)
-    return 4;
-  if (dbm > -75)
-    return 3;
-  if (dbm > -88)
-    return 2;
-  return 1;
-}
+//static uint8_t getSignalStrength() {
+//  const int32_t dbm = WiFi.RSSI();
+//  if (dbm > -63)
+//    return 4;
+//  if (dbm > -75)
+//    return 3;
+//  if (dbm > -88)
+//    return 2;
+//  return 1;
+//}
 
 void ApplianceBase::m_sendNetworkNotify(FrameType msgType) {
   NetworkNotifyData notify{};
   //notify.setConnected(WiFi.isConnected());
-  notify.setSignalStrength(getSignalStrength());
+  //notify.setSignalStrength(getSignalStrength());
   //notify.setIP(WiFi.localIP());
   notify.appendCRC();
   if (msgType == NETWORK_NOTIFY) {
