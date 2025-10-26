@@ -80,6 +80,12 @@ class ApplianceBase {
   static void setLogger(LoggerFn logger) { dudanov::setLogger(logger); }
 
  protected:
+
+  static const uint8_t MIN_TEMP_C = 0;
+  static const uint8_t MAX_TEMP_C = 37;
+  static const uint8_t MIN_TEMP_F = 32;
+  static const uint8_t MAX_TEMP_F = 99; 
+
   std::vector<OnStateCallback> m_stateCallbacks;
   // Timer manager
   TimerManager m_timerManager{};
