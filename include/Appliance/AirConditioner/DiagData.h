@@ -29,6 +29,7 @@ class DiagData : public FrameData {
   // Diag2
   float getIdFTarget() const;
   float getIdFVal() const;
+  float getDefrost() const;
   float getVal2_12() const;
   // Diag3
   float getOdFVal() const;
