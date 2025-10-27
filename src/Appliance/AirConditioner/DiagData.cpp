@@ -17,6 +17,7 @@ float DiagData::getEEV()    const { return static_cast<float>(this->m_getValue(8
 // Diag2
 float DiagData::getIdFTarget() const { return static_cast<float>(this->m_getValue(4)); }
 float DiagData::getIdFVal() const { return static_cast<float>(this->m_getValue(5)); }
+float DiagData::getDefrost() const { return static_cast<float>(this->m_getValue(12) & 0x01); }
 float DiagData::getVal2_12() const { return static_cast<float>(this->m_getValue(12)); }
 
 // Diag3
