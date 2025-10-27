@@ -315,6 +315,7 @@ ResponseStatus AirConditioner::m_readDiag2(FrameData data) {
   this->m_diag.copyDiag(newDiag);
   setProperty(this->m_idFTarget, newDiag.getIdFTarget(), hasUpdate);
   setProperty(this->m_idFVal, newDiag.getIdFVal(), hasUpdate);
+  setProperty(this->m_defrostVal, newDiag.getDefrost(), hasUpdate);
   setProperty(this->m_val2_12, newDiag.getVal2_12(), hasUpdate);
 
   if (hasUpdate)
