@@ -81,7 +81,7 @@ class AirConditioner : public ApplianceBase {
   float m_t4Temp{};
   float m_eev{};
   float m_runMode{};
-  bool  m_defrost{};
+  float m_defrost{};
   float m_val1_8{};
   float m_val2_12{};
   float m_targetTemp{};
