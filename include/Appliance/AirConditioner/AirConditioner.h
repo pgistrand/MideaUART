@@ -46,7 +46,7 @@ class AirConditioner : public ApplianceBase {
   float getIdFVal() const { return this->m_idFVal; }
   float getOdFVal() const { return this->m_odFVal; }
   float getRunMode() const { return this->m_runMode; }
-  bool  getDefrost() const { return this->m_defrost; }
+  bool  getDefrost() const { return (bool)this->m_defrost; }
   float getVal1_8() const { return this->m_val1_8; }
   float getVal2_12() const { return this->m_val2_12; }
   Mode getMode() const { return this->m_mode; }
